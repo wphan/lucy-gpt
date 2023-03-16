@@ -26,12 +26,12 @@ app.event('app_mention', async ({ event, client, logger }) => {
     logger.info(`Prompt: ${prompt}`);
 
     response = await openai.createCompletion({
-      engine: "gpt-3.5-turbo	",
+      engine: "gpt-3.5-turbo",
       prompt: prompt,
       max_tokens: 150,
       n: 1,
-      stop: null,
-      temperature: 0.5,
+      // stop: null,
+      // temperature: 0.5,
     });
 
     reply = response.choices[0].text.trim();
