@@ -1,4 +1,5 @@
 const { App } = require('@slack/bolt');
+const { LogLevel } = require('@slack/logger');
 
 /* 
 This sample slack application uses SocketMode
