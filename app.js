@@ -27,16 +27,17 @@ app.event('app_mention', async ({ event, client, logger }) => {
     logger.info(`Prompt: ${prompt}`);
 
     openai.listModels().then((data) => {
-      logger.info(data)
+      logger.info(JSON.stringify(data.data));
     });
 
     response = await openai.createCompletion({
-      model: "gpt-3.5-turbo",
+      // model: "gpt-3.5-turbo",
+      model: "text-davinci-002",
       prompt: prompt,
       max_tokens: 150,
       n: 1,
       // stop: null,
-      // temperature: 0.5,
+      temperature: 0.5,
     });
 
     reply = response.choices[0].text.trim();
@@ -51,13 +52,15 @@ app.event('app_mention', async ({ event, client, logger }) => {
   }
 
   // respond
-  try {
-    await client.chat.postMessage({
-      channel: event.channel,
-      text: ` <@${event.user}> ${reply}`
-    });
-  } catch (error) {
-    logger.error(error);
+  if (reply) {
+    try {
+      await client.chat.postMessage({
+        channel: event.channel,
+        text: ` <@${event.user}> ${reply}`
+      });
+    } catch (error) {
+      logger.error(error);
+    }
   }
 });
 
