@@ -26,6 +26,10 @@ app.event('app_mention', async ({ event, client, logger }) => {
     const prompt = event.text.replace(regex, "");
     logger.info(`Prompt: ${prompt}`);
 
+    openai.listModels().then((data) => {
+      logger.info(data)
+    });
+
     response = await openai.createCompletion({
       model: "gpt-3.5-turbo",
       prompt: prompt,
