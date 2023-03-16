@@ -9,7 +9,8 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   socketMode: true,
   scopes: ['chat:write', 'commands'],
-  logLevel: LogLevel.DEBUG,
+  // logLevel: LogLevel.DEBUG,
+  logLevel: LogLevel.INFO,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
@@ -40,7 +41,7 @@ app.event('app_mention', async ({ event, client, logger }) => {
       temperature: 0.5,
     });
 
-    logger.info(JSON.stringify(response));
+    logger.info(response);
 
     reply = response.choices[0].text.trim();
   }
