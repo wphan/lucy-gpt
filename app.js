@@ -18,6 +18,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
+
 app.event('app_mention', async ({ event, client, logger }) => {
   let reply = undefined;
   try {
@@ -26,7 +27,7 @@ app.event('app_mention', async ({ event, client, logger }) => {
     logger.info(`Prompt: ${prompt}`);
 
     response = await openai.createCompletion({
-      engine: "gpt-3.5-turbo",
+      model: "gpt-3.5-turbo",
       prompt: prompt,
       max_tokens: 150,
       n: 1,
