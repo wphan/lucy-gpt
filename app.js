@@ -26,9 +26,9 @@ app.event('app_mention', async ({ event, client, logger }) => {
     const prompt = event.text.replace(regex, "");
     logger.info(`Prompt: ${prompt}`);
 
-    openai.listModels().then((data) => {
-      logger.info(JSON.stringify(data.data));
-    });
+    // openai.listModels().then((data) => {
+    //   logger.info(JSON.stringify(data.data));
+    // });
 
     response = await openai.createCompletion({
       // model: "gpt-3.5-turbo",
@@ -39,6 +39,8 @@ app.event('app_mention', async ({ event, client, logger }) => {
       // stop: null,
       temperature: 0.5,
     });
+
+    logger.info(JSON.stringify(response));
 
     reply = response.choices[0].text.trim();
   }
