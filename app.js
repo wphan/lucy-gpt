@@ -23,7 +23,7 @@ app.event('app_mention', async ({ event, client, logger }) => {
     // Call chat.postMessage with the built-in client
     const result = await client.chat.postMessage({
       channel: event.channel,
-      text: ` <@${event.user.id}> :smirk:`
+      text: ` <@${event.user}> :smirk:`
     });
     logger.info(result);
   }
