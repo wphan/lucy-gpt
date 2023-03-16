@@ -9,6 +9,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^3.6.0"
+    "@slack/bolt": "^3.6.0",
+    "openai": "^3.2.1"
   }
 }
