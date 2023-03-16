@@ -12,6 +12,7 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN,
   token: process.env.SLACK_BOT_TOKEN,
   socketMode: true,
+  scopes: ['chat:write', 'commands'],
   logLevel: LogLevel.DEBUG,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
