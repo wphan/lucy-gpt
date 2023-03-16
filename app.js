@@ -47,7 +47,7 @@ app.event('app_mention', async ({ event, client, logger }) => {
       logger.info(response.data);
     }
 
-    reply = response.data.choices[0].text.trim();
+    reply = response.data.choices[0].text.trim().replace('\n\n', '\n');
   }
   catch (error) {
     logger.error(error);
