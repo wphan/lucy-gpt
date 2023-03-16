@@ -41,9 +41,13 @@ app.event('app_mention', async ({ event, client, logger }) => {
       temperature: 0.5,
     });
 
-    logger.info(response);
+    try {
+      logger.info(JSON.stringify(response.data));
+    } catch (e) {
+      logger.info(response.data);
+    }
 
-    reply = response.choices[0].text.trim();
+    reply = response.data.choices[0].text.trim();
   }
   catch (error) {
     logger.error(error);
