@@ -1,6 +1,6 @@
 const { App } = require('@slack/bolt');
 const { LogLevel } = require('@slack/logger');
-const openai = require("openai");
+const { Configuration, OpenAIApi } = require("openai");
 
 
 // Initializes your app with your bot token and app token
@@ -13,7 +13,10 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
-openai.apiKey = process.env.OPENAI_API_KEY;
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
 
 app.event('app_mention', async ({ event, client, logger }) => {
   let reply = undefined;
@@ -22,7 +25,7 @@ app.event('app_mention', async ({ event, client, logger }) => {
     const prompt = event.text.replace(regex, "");
     logger.info(`Prompt: ${prompt}`);
 
-    response = await openai.Completion.create({
+    response = await openai.createCompletion({
       engine: "gpt-3.5-turbo	",
       prompt: prompt,
       max_tokens: 150,
