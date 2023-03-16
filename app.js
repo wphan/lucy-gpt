@@ -1,11 +1,7 @@
 const { App } = require('@slack/bolt');
 const { LogLevel } = require('@slack/logger');
+const openai = require("openai");
 
-/* 
-This sample slack application uses SocketMode
-For the companion getting started setup guide, 
-see: https://slack.dev/bolt-js/tutorial/getting-started 
-*/
 
 // Initializes your app with your bot token and app token
 const app = new App({
@@ -17,17 +13,42 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
+openai.apiKey = process.env.OPENAI_API_KEY;
+
 app.event('app_mention', async ({ event, client, logger }) => {
-  console.log(event);
+  let reply = undefined;
   try {
-    // Call chat.postMessage with the built-in client
-    const result = await client.chat.postMessage({
-      channel: event.channel,
-      text: ` <@${event.user}> :smirk:`
+    const regex = /^<@\w+>\s*/;
+    const prompt = event.text.replace(regex, "");
+    logger.info(`Prompt: ${prompt}`);
+
+    response = await openai.Completion.create({
+      engine: "gpt-3.5-turbo	",
+      prompt: prompt,
+      max_tokens: 150,
+      n: 1,
+      stop: null,
+      temperature: 0.5,
     });
-    logger.info(result);
+
+    reply = response.choices[0].text.trim();
   }
   catch (error) {
+    logger.error(error);
+
+    await client.chat.postMessage({
+      channel: event.channel,
+      text: ` <@${event.user}> got an error :disappointed:`
+    });
+  }
+
+  // respond
+  try {
+    await client.chat.postMessage({
+      channel: event.channel,
+      text: ` <@${event.user}> ${reply}`
+    });
+  } catch (error) {
     logger.error(error);
   }
 });
