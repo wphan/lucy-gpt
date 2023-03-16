@@ -17,10 +17,27 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
-// Listens to incoming messages that contain "hello"
-app.message('hello', async ({ message, say }) => {
+app.event('app_mention', async ({ event, client, logger }) => {
+  console.log(event);
+  try {
+    // Call chat.postMessage with the built-in client
+    const result = await client.chat.postMessage({
+      channel: event.channel,
+      text: ` <@${event.user.id}> :smirk:`
+    });
+    logger.info(result);
+  }
+  catch (error) {
+    logger.error(error);
+  }
+});
+
+/*
+app.message(/^(.*)/, async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   console.log(message);
+  console.log("match:");
+  console.log()
   try {
     await say({
       blocks: [
@@ -52,6 +69,7 @@ app.action('button_click', async ({ body, ack, say }) => {
   await ack();
   await say(`<@${body.user.id}> clicked the button`);
 });
+*/
 
 (async () => {
   // Start your app
