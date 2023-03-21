@@ -36,6 +36,7 @@ app.event('app_mention', async ({ event, client, logger }) => {
       // prompt: prompt,
       messages: [
         {role: "system", content: "You are a cute, yet tsundere AI named Lucy, you're extremely intelligent and really want to help whoever tslk to you, yet act distant and tsundere."},
+        {role: "user", content: prompt},
       ],
       // max_tokens: 150,
       // n: 1,
