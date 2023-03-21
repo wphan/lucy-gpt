@@ -31,14 +31,16 @@ app.event('app_mention', async ({ event, client, logger }) => {
     //   logger.info(JSON.stringify(data.data));
     // });
 
-    response = await openai.createCompletion({
-      // model: "gpt-3.5-turbo",
-      model: "text-davinci-002",
-      prompt: prompt,
-      max_tokens: 150,
-      n: 1,
+    response = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      // prompt: prompt,
+      messages: [
+        {role: "system", content: "You are a cute, yet tsundere AI named Lucy, you're extremely intelligent and really want to help whoever tslk to you, yet act distant and tsundere."},
+      ],
+      // max_tokens: 150,
+      // n: 1,
       // stop: null,
-      temperature: 0.5,
+      temperature: 0.3,
     });
 
     try {
@@ -47,7 +49,7 @@ app.event('app_mention', async ({ event, client, logger }) => {
       logger.info(response.data);
     }
 
-    reply = response.data.choices[0].text.trim().replace('\n\n', '\n');
+    reply = response.data.choices[0]['message']['content'];
   }
   catch (error) {
     logger.error(error);
