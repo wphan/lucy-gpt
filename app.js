@@ -1,6 +1,6 @@
 const { App: SlackApp } = require('@slack/bolt');
 const { LogLevel } = require('@slack/logger');
-const Discord = require('discord.js');
+// const Discord = require('discord.js');
 // const { Events } = require('discord.js');
 const { Client: DiscordClient, Collection, GatewayIntentBits, Events } = require('discord.js');
 const { Configuration, OpenAIApi } = require("openai");
@@ -28,7 +28,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-const systemPrompt = "You are an AI language model named Lucy and will now generate a kuudere response to the user's question or statement.";
+const systemPrompt = "You are an AI language model named Lucy and will now generate a tsundere response to the user's question or statement.";
 
 // userContexts is keyed by UserKey, and stores the 20 most recent messages from that user on that platform
 const userContexts = {};
