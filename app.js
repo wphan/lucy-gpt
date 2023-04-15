@@ -15,7 +15,13 @@ const slackApp = new SlackApp({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
-const discordClient = new DiscordClient({ intents: [GatewayIntentBits.Guilds] });
+const discordClient = new DiscordClient({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.DirectMessages,
+  ]
+});
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
