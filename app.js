@@ -83,32 +83,32 @@ async function doPrompt(chatMsg) {
   });
 
   try {
-    logger.info(JSON.stringify(response.data));
+    console.log(JSON.stringify(response.data));
   } catch (e) {
-    logger.info(response.data);
+    console.log(response.data);
   }
 
   return response.data.choices[0]['message']['content'];
 }
 
 
-slackApp.event('app_mention', async ({ event, client, logger }) => {
+slackApp.event('app_mention', async ({ event, client }) => {
   let reply = undefined;
   const userKey = getUserKey("slack", event.user);
   const regex = /^<@\w+>\s*/;
   const prompt = event.text.replace(regex, "");
-  logger.info(`User: ${userKey}, Prompt: ${prompt}`);
+  console.log(`User: ${userKey}, Prompt: ${prompt}`);
   try {
 
     // openai.listModels().then((data) => {
-    //   logger.info(JSON.stringify(data.data));
+    //   console.log(JSON.stringify(data.data));
     // });
 
     const chatMsg = buildUserContextMessages(userKey, prompt);
     reply = await doPrompt(chatMsg);
   }
   catch (error) {
-    logger.error(error);
+    console.error(error);
 
     await client.chat.postMessage({
       channel: event.channel,
@@ -125,7 +125,7 @@ slackApp.event('app_mention', async ({ event, client, logger }) => {
         text: ` <@${event.user}> ${reply}`
       });
     } catch (error) {
-      logger.error(error);
+      console.error(error);
     }
   }
 });
@@ -140,13 +140,13 @@ discordClient.on(Events.MessageCreate, async (message) => {
   const userKey = getUserKey("discord", message.author.id);
   const regex = /^<@\w+>\s*/;
   const prompt = message.content.replace(regex, "");
-  logger.info(`User: ${userKey}, Prompt: ${prompt}`);
+  console.log(`User: ${userKey}, Prompt: ${prompt}`);
 
   try {
     const chatMsg = buildUserContextMessages(userKey, prompt);
     reply = await doPrompt(chatMsg);
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     await message.channel.send(`<@${message.author.id}> got an error :disappointed:`);
   }
 
@@ -156,7 +156,7 @@ discordClient.on(Events.MessageCreate, async (message) => {
     try {
       await message.channel.send(`<@${message.author.id}> ${reply}`);
     } catch (error) {
-      logger.error(error);
+      console.error(error);
     }
   }
 });
