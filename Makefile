@@ -1,3 +1,6 @@
+login:
+	heroku login
+
 deploy:
 	git push heroku main
 
