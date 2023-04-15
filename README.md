@@ -1,67 +1,35 @@
-# Getting Started ⚡️ Bolt for JavaScript
-> Slack app example from 📚 [Getting started with Bolt for JavaScript tutorial][1]
+# LLM Chat Bot With multi App Support
 
-## Overview
+This is a chat bot that uses the OpenAI API for an LLM, with frontend connections to Slack and Discord.
 
-This is a Slack app built with the [Bolt for JavaScript framework][2] that showcases
-responding to events and interactive buttons.
+## Features
+* OpenAI (`gpt-3.5-turbo` model by default) API integration for LLM
+* Supports multiple apps (Slack and Discord)
+* Maintains context for each user on each app (last 20 messages)
+* Easily deploy on Heroku
 
-## Running locally
+## Setup
 
-### 0. Create a new Slack App
+Discord app setup: https://discord.com/developers, create new application, and get the bot token
 
-- Go to https://api.slack.com/apps
-- Click **Create App**
-- Choose a workspace
-- Enter App Manifest using contents of `manifest.yaml`
-- Click **Create**
+Slack app setup: https://slack.dev/bolt-js/tutorial/getting-started
 
-Once the app is created click **Install to Workspace** 
-Then scroll down in Basic Info and click **Generate Token and Scopes** with both scopes
+OpenAI API key: https://platform.openai.com/
 
-### 1. Setup environment variables
 
-```zsh
-# Replace with your bot and app token
-export SLACK_BOT_TOKEN=<your-bot-token> # from the OAuth section
-export SLACK_APP_TOKEN=<your-app-level-token> # from the Basic Info App Token Section
-```
+1. Clone this repo
+2. Create Heroku App
+    a. create an app on heroku
+    b. Add environment variables to the heroku app
+        a. `OPENAI_API_KEY`
+        b. `SLACK_APP_TOKEN`
+        c. `SLACK_BOT_TOKEN`
+        d. `SLACK_SIGNING_SECRET`
+        e. `DISCORD_BOT_TOKEN`
+3. Deploy Heroku App
+    a. install `make` and `heroku` cli
+    b. `make login` (login to heroku cli)
+    c. `make deploy` (deploy to heroku)
 
-### 2. Setup your local project
 
-```zsh
-# Clone this project onto your machine
-git clone https://github.com/slackapi/bolt-js-getting-started-app.git
-
-# Change into the project
-cd bolt-js-getting-started-app/
-
-# Install the dependencies
-npm install
-```
-
-### 3. Start servers
-```zsh
-npm run start
-```
-
-### 4. Test
-
-Go to the installed workspace and type **Hello** in a DM to your new bot. You can also type **Hello** in a channel where the bot is present
-
-## Contributing
-
-### Issues and questions
-
-Found a bug or have a question about this project? We'd love to hear from you!
-
-1. Browse to [slackapi/bolt-js/issues][4]
-1. Create a new issue
-1. Select the `[x] examples` category
-
-See you there and thanks for helping to improve Bolt for everyone!
-
-[1]: https://slack.dev/bolt-js/tutorial/getting-started
-[2]: https://slack.dev/bolt-js/
-[3]: https://slack.dev/bolt-js/tutorial/getting-started#setting-up-events
-[4]: https://github.com/slackapi/bolt-js/issues/new
+Modify `systemPrompt` in `app.js` to change the prompt for the LLM.
