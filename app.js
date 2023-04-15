@@ -1,9 +1,9 @@
 const { App: SlackApp } = require('@slack/bolt');
 const { LogLevel } = require('@slack/logger');
+const Discord = require('discord.js');
+const { Events } = require('discord.js');
 const { Configuration, OpenAIApi } = require("openai");
 
-
-// Initializes your app with your bot token and app token
 const slackApp = new SlackApp({
   appToken: process.env.SLACK_APP_TOKEN,
   token: process.env.SLACK_BOT_TOKEN,
@@ -13,6 +13,8 @@ const slackApp = new SlackApp({
   logLevel: LogLevel.INFO,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
+
+const discordClient = Discord.Client();
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -119,9 +121,22 @@ slackApp.event('app_mention', async ({ event, client, logger }) => {
   }
 });
 
+discordClient.on('message', async (message) => {
+  console.log(`Received message from ${message.author.id}: ${message.content}`);
+  if (!message.mentions.has(discordClient.user)) {
+    return;
+  }
+
+  const userKey = getUserKey("discord", message.author.id);
+  console.log(`userkey: ${userKey}`)
+
+});
+
+
 (async () => {
-  // Start your app
   await slackApp.start();
+  await discordClient.login(process.env.DISCORD_TOKEN);
+  console.log(`Logged in to Discord as ${discordClient.user}!`)
 
   console.log('⚡️ Bolt app is running!');
 })();
