@@ -1,7 +1,8 @@
 const { App: SlackApp } = require('@slack/bolt');
 const { LogLevel } = require('@slack/logger');
 const Discord = require('discord.js');
-const { Events } = require('discord.js');
+// const { Events } = require('discord.js');
+const { Client: DiscordClient, Collection, GatewayIntentBits } = require('discord.js');
 const { Configuration, OpenAIApi } = require("openai");
 
 const slackApp = new SlackApp({
@@ -14,7 +15,7 @@ const slackApp = new SlackApp({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
-const discordClient = Discord.Client();
+const discordClient = DiscordClient({ intents: [GatewayIntentBits.Guilds] });
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
