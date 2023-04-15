@@ -69,26 +69,26 @@ function buildUserContextMessages(userKey, newPrompt) {
 }
 
 async function doPrompt(chatMsg) {
-    response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: chatMsg,
-      // messages: [
-      //   { role: "system", content: systemPrompt },
-      //   { role: "user", content: prompt },
-      // ],
-      // max_tokens: 150,
-      // n: 1,
-      // stop: null,
-      temperature: 0.3,
-    });
+  response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: chatMsg,
+    // messages: [
+    //   { role: "system", content: systemPrompt },
+    //   { role: "user", content: prompt },
+    // ],
+    // max_tokens: 150,
+    // n: 1,
+    // stop: null,
+    temperature: 0.3,
+  });
 
-    try {
-      logger.info(JSON.stringify(response.data));
-    } catch (e) {
-      logger.info(response.data);
-    }
+  try {
+    logger.info(JSON.stringify(response.data));
+  } catch (e) {
+    logger.info(response.data);
+  }
 
-    return response.data.choices[0]['message']['content'];
+  return response.data.choices[0]['message']['content'];
 }
 
 
@@ -139,7 +139,7 @@ discordClient.on(Events.MessageCreate, async (message) => {
 
   const userKey = getUserKey("discord", message.author.id);
   const regex = /^<@\w+>\s*/;
-  const prompt = message.content.text.replace(regex, "");
+  const prompt = message.content.replace(regex, "");
   logger.info(`User: ${userKey}, Prompt: ${prompt}`);
 
   try {
