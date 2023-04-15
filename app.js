@@ -68,21 +68,7 @@ function buildUserContextMessages(userKey, newPrompt) {
   return messages;
 }
 
-
-slackApp.event('app_mention', async ({ event, client, logger }) => {
-  let reply = undefined;
-  const userKey = getUserKey("slack", event.user);
-  const regex = /^<@\w+>\s*/;
-  const prompt = event.text.replace(regex, "");
-  logger.info(`User: ${userKey}, Prompt: ${prompt}`);
-  try {
-
-    // openai.listModels().then((data) => {
-    //   logger.info(JSON.stringify(data.data));
-    // });
-
-    const chatMsg = buildUserContextMessages(userKey, prompt);
-
+async function doPrompt(chatMsg) {
     response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: chatMsg,
@@ -102,7 +88,24 @@ slackApp.event('app_mention', async ({ event, client, logger }) => {
       logger.info(response.data);
     }
 
-    reply = response.data.choices[0]['message']['content'];
+    return response.data.choices[0]['message']['content'];
+}
+
+
+slackApp.event('app_mention', async ({ event, client, logger }) => {
+  let reply = undefined;
+  const userKey = getUserKey("slack", event.user);
+  const regex = /^<@\w+>\s*/;
+  const prompt = event.text.replace(regex, "");
+  logger.info(`User: ${userKey}, Prompt: ${prompt}`);
+  try {
+
+    // openai.listModels().then((data) => {
+    //   logger.info(JSON.stringify(data.data));
+    // });
+
+    const chatMsg = buildUserContextMessages(userKey, prompt);
+    reply = await doPrompt(chatMsg);
   }
   catch (error) {
     logger.error(error);
@@ -113,7 +116,6 @@ slackApp.event('app_mention', async ({ event, client, logger }) => {
     });
   }
 
-  // respond
   if (reply) {
     recordUserPrompt(userKey, prompt);
     recordAssistantResponse(userKey, reply);
@@ -129,15 +131,32 @@ slackApp.event('app_mention', async ({ event, client, logger }) => {
 });
 
 discordClient.on(Events.MessageCreate, async (message) => {
-  console.log(`Received message from ${message.author.id}: ${message.content}`);
-  console.log(JSON.stringify(message, null, 2));
   if (!message.mentions.has(discordClient.user)) {
     return;
   }
 
   const userKey = getUserKey("discord", message.author.id);
-  console.log(`userkey: ${userKey}`)
+  const regex = /^<@\w+>\s*/;
+  const prompt = message.content.text.replace(regex, "");
+  logger.info(`User: ${userKey}, Prompt: ${prompt}`);
 
+  try {
+    const chatMsg = buildUserContextMessages(userKey, prompt);
+    reply = await doPrompt(chatMsg);
+  } catch (error) {
+    logger.error(error);
+    await message.channel.send(`<@${message.author.id}> got an error :disappointed:`);
+  }
+
+  if (reply) {
+    recordUserPrompt(userKey, prompt);
+    recordAssistantResponse(userKey, reply);
+    try {
+      await message.channel.send(`<@${message.author.id}> ${reply}`);
+    } catch (error) {
+      logger.error(error);
+    }
+  }
 });
 
 
