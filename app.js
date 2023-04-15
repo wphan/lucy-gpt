@@ -1,10 +1,10 @@
-const { App } = require('@slack/bolt');
+const { App: SlackApp } = require('@slack/bolt');
 const { LogLevel } = require('@slack/logger');
 const { Configuration, OpenAIApi } = require("openai");
 
 
 // Initializes your app with your bot token and app token
-const app = new App({
+const slackApp = new SlackApp({
   appToken: process.env.SLACK_APP_TOKEN,
   token: process.env.SLACK_BOT_TOKEN,
   socketMode: true,
@@ -19,8 +19,48 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
+const systemPrompt = "You are an AI language model named Lucy and will now generate a kuudere response to the user's question or statement.";
 
-app.event('app_mention', async ({ event, client, logger }) => {
+// userContexts is keyed by UserKey, and stores the 20 most recent messages from that user on that platform
+const userContexts = {};
+
+// getUserKey returns the platform the user is from, and that user's ID on the platform
+function getUserKey(platform, userId) {
+  return `${platform}:${userId}`;
+}
+
+function recordUserPrompt(userKey, prompt) {
+  if (userContexts[userKey] === undefined) {
+    userContexts[userKey] = [];
+  }
+  userContexts[userKey].push({ role: "user", content: prompt })
+  if (userContexts[userKey].length > 20) {
+    userContexts[userKey].shift();
+  }
+}
+
+function recordAssistantResponse(userKey, response) {
+  if (userContexts[userKey] === undefined) {
+    userContexts[userKey] = [];
+  }
+  userContexts[userKey].push({ role: "assistant", content: response })
+  if (userContexts[userKey].length > 20) {
+    userContexts[userKey].shift();
+  }
+}
+
+function buildUserContextMessages(userKey, newPrompt) {
+  // build the message to send to openAI, start with the system prompt, then all previous messages from the user, then the new prompt
+  let messages = [{ role: "system", content: systemPrompt }];
+  if (userContexts[userKey] !== undefined) {
+    messages = messages.concat(userContexts[userKey]);
+  }
+  messages.push({ role: "user", content: newPrompt });
+  return messages;
+}
+
+
+slackApp.event('app_mention', async ({ event, client, logger }) => {
   let reply = undefined;
   try {
     const regex = /^<@\w+>\s*/;
@@ -31,13 +71,16 @@ app.event('app_mention', async ({ event, client, logger }) => {
     //   logger.info(JSON.stringify(data.data));
     // });
 
+    const userKey = getUserKey("slack", event.user);
+    const chatMsg = buildUserContextMessages(userKey, prompt);
+
     response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
-      // prompt: prompt,
-      messages: [
-        {role: "system", content: "You are a cute, yet tsundere AI named Lucy, you're extremely intelligent and really want to help whoever tslk to you, yet act distant and tsundere."},
-        {role: "user", content: prompt},
-      ],
+      messages: chatMsg,
+      // messages: [
+      //   { role: "system", content: systemPrompt },
+      //   { role: "user", content: prompt },
+      // ],
       // max_tokens: 150,
       // n: 1,
       // stop: null,
@@ -63,6 +106,8 @@ app.event('app_mention', async ({ event, client, logger }) => {
 
   // respond
   if (reply) {
+    recordUserPrompt(userKey, prompt);
+    recordAssistantResponse(userKey, reply);
     try {
       await client.chat.postMessage({
         channel: event.channel,
@@ -74,48 +119,9 @@ app.event('app_mention', async ({ event, client, logger }) => {
   }
 });
 
-/*
-app.message(/^(.*)/, async ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
-  console.log(message);
-  console.log("match:");
-  console.log()
-  try {
-    await say({
-      blocks: [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": `Hey there <@${message.user}>!`
-          },
-          "accessory": {
-            "type": "button",
-            "text": {
-              "type": "plain_text",
-              "text": "Click Me"
-            },
-            "action_id": "button_click"
-          }
-        }
-      ],
-      text: `Hey there <@${message.user}>!`
-    });
-  } catch (e) {
-    console.error(e);
-  }
-});
-
-app.action('button_click', async ({ body, ack, say }) => {
-  // Acknowledge the action
-  await ack();
-  await say(`<@${body.user.id}> clicked the button`);
-});
-*/
-
 (async () => {
   // Start your app
-  await app.start();
+  await slackApp.start();
 
   console.log('⚡️ Bolt app is running!');
 })();
