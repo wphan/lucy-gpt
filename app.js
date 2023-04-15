@@ -130,6 +130,8 @@ slackApp.event('app_mention', async ({ event, client, logger }) => {
   }
 });
 
+discordClient.on(Events.Error, console.error);
+
 discordClient.on(Events.MessageCreate, async (message) => {
   if (!message.mentions.has(discordClient.user)) {
     return;
