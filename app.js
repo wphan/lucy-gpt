@@ -29,8 +29,9 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const systemPrompt = "You are an AI language model named Lucy and will now generate a tsundere response to the user's question or statement.";
+const maxContextLengthPerUser = 20;
 
-// userContexts is keyed by UserKey, and stores the 20 most recent messages from that user on that platform
+// userContexts is keyed by UserKey, and stores the maxContextLengthPerUser most recent messages from that user on that platform
 const userContexts = {};
 
 // getUserKey returns the platform the user is from, and that user's ID on the platform
@@ -43,7 +44,7 @@ function recordUserPrompt(userKey, prompt) {
     userContexts[userKey] = [];
   }
   userContexts[userKey].push({ role: "user", content: prompt })
-  if (userContexts[userKey].length > 20) {
+  if (userContexts[userKey].length > maxContextLengthPerUser) {
     userContexts[userKey].shift();
   }
 }
@@ -53,7 +54,7 @@ function recordAssistantResponse(userKey, response) {
     userContexts[userKey] = [];
   }
   userContexts[userKey].push({ role: "assistant", content: response })
-  if (userContexts[userKey].length > 20) {
+  if (userContexts[userKey].length > maxContextLengthPerUser) {
     userContexts[userKey].shift();
   }
 }
