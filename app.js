@@ -62,6 +62,7 @@ function buildUserContextMessages(userKey, newPrompt) {
 
 slackApp.event('app_mention', async ({ event, client, logger }) => {
   let reply = undefined;
+  const userKey = getUserKey("slack", event.user);
   try {
     const regex = /^<@\w+>\s*/;
     const prompt = event.text.replace(regex, "");
@@ -71,7 +72,6 @@ slackApp.event('app_mention', async ({ event, client, logger }) => {
     //   logger.info(JSON.stringify(data.data));
     // });
 
-    const userKey = getUserKey("slack", event.user);
     const chatMsg = buildUserContextMessages(userKey, prompt);
 
     response = await openai.createChatCompletion({
