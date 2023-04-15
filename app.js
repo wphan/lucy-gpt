@@ -130,6 +130,7 @@ slackApp.event('app_mention', async ({ event, client, logger }) => {
 
 discordClient.on(Events.MessageCreate, async (message) => {
   console.log(`Received message from ${message.author.id}: ${message.content}`);
+  console.log(JSON.stringify(message, null, 2));
   if (!message.mentions.has(discordClient.user)) {
     return;
   }
