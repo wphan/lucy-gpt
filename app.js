@@ -2,7 +2,7 @@ const { App: SlackApp } = require('@slack/bolt');
 const { LogLevel } = require('@slack/logger');
 const Discord = require('discord.js');
 // const { Events } = require('discord.js');
-const { Client: DiscordClient, Collection, GatewayIntentBits } = require('discord.js');
+const { Client: DiscordClient, Collection, GatewayIntentBits, Events } = require('discord.js');
 const { Configuration, OpenAIApi } = require("openai");
 
 const slackApp = new SlackApp({
@@ -122,7 +122,7 @@ slackApp.event('app_mention', async ({ event, client, logger }) => {
   }
 });
 
-discordClient.on('message', async (message) => {
+discordClient.on(Events.MessageCreate, async (message) => {
   console.log(`Received message from ${message.author.id}: ${message.content}`);
   if (!message.mentions.has(discordClient.user)) {
     return;
