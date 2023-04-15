@@ -63,10 +63,10 @@ function buildUserContextMessages(userKey, newPrompt) {
 slackApp.event('app_mention', async ({ event, client, logger }) => {
   let reply = undefined;
   const userKey = getUserKey("slack", event.user);
+  const regex = /^<@\w+>\s*/;
+  const prompt = event.text.replace(regex, "");
+  logger.info(`User: ${userKey}, Prompt: ${prompt}`);
   try {
-    const regex = /^<@\w+>\s*/;
-    const prompt = event.text.replace(regex, "");
-    logger.info(`Prompt: ${prompt}`);
 
     // openai.listModels().then((data) => {
     //   logger.info(JSON.stringify(data.data));
